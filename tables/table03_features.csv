@@ -1,0 +1,19 @@
+#,Feature,Category,Definition,Mean |SHAP|
+1,pit_has_repository,Identity & links,Repository field present at t_p (boolean),1.1487
+2,pit_author_email_domain_score,Authorship & maintainers,"Ordinal score of the author email domain (organisational, free-mail, disposable, missing); local part discarded",0.9058
+3,pit_has_install_hook,Build & install,"Install, preinstall or postinstall hook declared (boolean)",0.9047
+4,pit_days_since_first,Release history,Days between the first release and t_p,0.8987
+5,pit_long_description_len,Description & keywords,Character length of the long description at t_p,0.8905
+6,pit_n_maintainers,Authorship & maintainers,Number of maintainer accounts listed at t_p,0.8365
+7,pit_has_engines,Build & install,Engines field present in the manifest (boolean),0.7964
+8,pit_n_keywords,Description & keywords,Number of declared keywords at t_p,0.7753
+9,vman_author_len,Authorship & maintainers,Character length of the author field in the published manifest,0.7519
+10,pit_median_gap_days,Release history,Median inter-release interval before t_p,0.7014
+11,pit_ver_is_zero_major,Versioning,Version string begins with 0. (boolean),0.63
+12,pit_name_has_scope,Identity & links,Package name carries an organisation scope (boolean),0.5931
+13,pit_scripts_max_len,Build & install,"Longest declared script, in characters",0.4755
+14,pit_description_len,Description & keywords,Character length of the summary at t_p,0.4007
+15,pit_std_gap_days,Release history,Standard deviation of inter-release intervals before t_p,0.3787
+16,pit_n_dependencies,Dependencies,Declared runtime dependencies at t_p,0.365
+17,vman_description_len,Description & keywords,Character length of the description in the published manifest,0.2901
+18,pit_description_entropy,Description & keywords,Shannon entropy of the summary at t_p,0.2222

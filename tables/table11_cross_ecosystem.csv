@@ -1,0 +1,4 @@
+Direction,AUC-ROC,AU-PR,AU-PR baseline,n test,n malicious
+npm->pypi,0.5893,0.1129,0.0958,825,79
+pypi->npm,0.5433,0.8741,0.8351,2505,2092
+Ecosystem of origin only (no metadata),0.8036,,,3330,2171

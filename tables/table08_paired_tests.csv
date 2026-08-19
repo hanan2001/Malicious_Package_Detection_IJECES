@@ -1,0 +1,4 @@
+Comparison,AU-PR (alt.),Delta AU-PR,CI low,CI high,"p (bootstrap, Bonf.)",b,c,"p (McNemar, Bonf.)",Jaccard
+Ours vs Mutual information,0.9807,0.0111,0.0056,0.0178,0.0,86,17,0.0,0.3846
+Ours vs RF importance,0.9888,0.0031,0.0012,0.0053,0.0,46,14,0.0001,0.5
+Ours vs L1 logistic,0.993,-0.001,-0.0025,0.0003,0.381,4,23,0.0009,0.44

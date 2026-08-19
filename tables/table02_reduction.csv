@@ -1,0 +1,4 @@
+Stage,Features in,Features out,Removed
+Extracted point-in-time attributes,-,456,-
+Ecosystem pre-filter (vman scope),456,52,404
+"Embedded selection, top-k (a priori)",52,18,34

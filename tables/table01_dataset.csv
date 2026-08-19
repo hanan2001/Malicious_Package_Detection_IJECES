@@ -1,0 +1,4 @@
+Ecosystem,Versions,Malicious,Benign,Malicious %
+NPM,2505,2092,413,83.5%
+PYPI,825,79,746,9.6%
+Total,3330,2171,1159,65.2%
