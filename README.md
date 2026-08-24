@@ -4,10 +4,9 @@ This repository contains the replication package for the paper:
 **"Explainable Detection of Malicious Packages Using Point‑in‑Time Metadata"**
 
 ## Contents
-- `final_pipeline.py` / `IJECES_CLAUDE.ipynb` : Main code to reproduce all results.
+- `final_pipeline_ijeces.py` : Main code to reproduce all results.
 - `tables/` : CSV files for Tables 1 to 11.
 - `figures/` : Figures 2 to 6 in PNG, PDF and SVG.
-- `final_partitions.csv` : Train/Val/Test split for every package version.
 
 ## How to run
 1. Open the notebook in Google Colab.
