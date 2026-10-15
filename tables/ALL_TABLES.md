@@ -57,7 +57,7 @@
 
 ---
 
-**Table 4. Model performance on the test partition (n = 968), CatBoost with 18 features under the corrected protocol.**
+**Table 4. Model performance on the test partition (n = 968), CatBoost with 18 features.**
 
 | Metric | Value |
 |---|---|
@@ -80,7 +80,7 @@
 
 ---
 
-**Table 5. Alert quality at operational prevalence, threshold 0.500 (default 0.5 (validation-optimised threshold did not transfer)). A false-positive rate measured at zero on 277 benign instances is not zero; the upper95 rows apply the rule of three.**
+**Table 5. Alert quality at operational prevalence, threshold 0.500 (default 0.5 (validation-optimised threshold did not transfer)). The upper95 rows use the one-sided 95% Clopper-Pearson upper bound on the false-positive rate (4 false positives among 277 benign test versions).**
 
 | Prevalence | FPR estimate | Recall | FPR | PPV | Alerts per 10,000 | True positives per 10,000 | Missed per 10,000 |
 |---|---|---|---|---|---|---|---|
@@ -99,7 +99,7 @@
 | Feature set | AU-PR | AUC-ROC | Mean proxies per draw |
 |---|---|---|---|
 | Random 18 of 456 (full space) | 0.911 | 0.8253 | 15.8667 |
-| Random 18 of 52 (post-filter) | 0.9825 |  | 0.0 |
+| Random 18 of 52 (post-filter) | 0.9825 | 0.9598 | 0.0 |
 | Selected 18 (ours) | 0.9919 | 0.9766 | 0.0 |
 
 
@@ -107,7 +107,7 @@
 
 **Table 7. Performance as a function of feature-set size. Differences from k = 18 are compared with the bootstrap interval width (0.0059); k was declared a priori and this sweep is reported, not used for the choice.**
 
-| k | AU-PR | AUC-ROC | Delta vs k=18 | Within CI |
+| k | AU-PR | AUC-ROC | Delta vs k=18 | |Delta| <= CI width |
 |---|---|---|---|---|
 | 5 | 0.9784 | 0.9485 | -0.0135 | False |
 | 10 | 0.9883 | 0.9691 | -0.0036 | True |
@@ -156,7 +156,7 @@
 
 ---
 
-**Table 11. Cross-ecosystem transfer. A classifier using only the ecosystem of origin attains AUC-ROC 0.8036, so 63.7% of discrimination above chance is attributable to registry identity.**
+**Table 11. Cross-ecosystem transfer. A classifier using only the ecosystem of origin (computed on all 3330 versions) attains AUC-ROC 0.8036, which corresponds to 63.7% of the above-chance AUC margin of the full model; this is a descriptive, non-causal comparison.**
 
 | Direction | AUC-ROC | AU-PR | AU-PR baseline | n test | n malicious |
 |---|---|---|---|---|---|

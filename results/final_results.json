@@ -240,7 +240,9 @@
     },
     "random_post": {
       "n": 52,
-      "au_pr": 0.982531900986188
+      "au_pr": 0.982531900986188,
+      "auc": 0.9597977085477544,
+      "auc_note": "added 2026-10-15 from a re-run of the released script on the same dataset (Python 3.10, scikit-learn 1.3.2, CatBoost 1.2.5, SHAP 0.44.1)"
     },
     "prefilter_gain": 0.07156500710023495,
     "selection_gain": 0.009357489285073073,

@@ -1,4 +1,4 @@
-k,AU-PR,AUC-ROC,Delta vs k=18,Within CI
+k,AU-PR,AUC-ROC,Delta vs k=18,|Delta| <= CI width
 5,0.9784,0.9485,-0.0135,False
 10,0.9883,0.9691,-0.0036,True
 15,0.9897,0.9702,-0.0022,True

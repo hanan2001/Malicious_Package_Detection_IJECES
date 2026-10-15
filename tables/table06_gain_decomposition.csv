@@ -1,4 +1,4 @@
 Feature set,AU-PR,AUC-ROC,Mean proxies per draw
 Random 18 of 456 (full space),0.911,0.8253,15.8667
-Random 18 of 52 (post-filter),0.9825,,0.0
+Random 18 of 52 (post-filter),0.9825,0.9598,0.0
 Selected 18 (ours),0.9919,0.9766,0.0

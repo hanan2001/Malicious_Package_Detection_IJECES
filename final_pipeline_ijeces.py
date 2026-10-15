@@ -9,7 +9,7 @@ Original file is located at
 
 """
 =============================================================================
-PIPELINE FINAL + GENERATION DES FIGURES ET TABLES — jcp-4466772
+PIPELINE FINAL + GENERATION DES FIGURES ET TABLES
 =============================================================================
 Configuration figee : deux ecosystemes, pre-filtre vman, k = 18.
 Justifiee par la comparaison de quatre executions : meilleur lift AU-PR
@@ -64,12 +64,14 @@ CFG = dict(
 
 try:
     from google.colab import drive; drive.mount("/content/drive")
-    OUT = "/content/drive/MyDrive/JCP_revision"
+    OUT = "/content/drive/MyDrive/IJECES_revision"
 except Exception:
-    OUT = "./JCP_revision"
+    OUT = "./IJECES_revision"
 FIG = f"{OUT}/figures"; TAB = f"{OUT}/tables"
 for d in (OUT, FIG, TAB): os.makedirs(d, exist_ok=True)
-CACHE = f"{OUT}/dataset_v5.csv"
+# Jeu de donnees : Dataset/dataset_v5.csv du depot si present, sinon le dossier de sortie
+CACHE = ("Dataset/dataset_v5.csv" if os.path.exists("Dataset/dataset_v5.csv")
+         else f"{OUT}/dataset_v5.csv")
 R = {"config": CFG}
 MD = {}                      # tables en markdown, pour le manuscrit
 
@@ -327,6 +329,8 @@ def make_prep(feats):
 prep_post, prep_full = make_prep(F_POST), make_prep(F_FULL)
 Xtr, Xva, Xte = prep_post(train), prep_post(val), prep_post(test)
 XtrF, XteF = prep_full(train), prep_full(test)
+# Desequilibre de classes : un seul mecanisme, la ponderation equilibree de CatBoost
+# (auto_class_weights="Balanced"). Aucun reechantillonnage n'est applique.
 HP0 = dict(iterations=400, learning_rate=0.1, depth=6, verbose=0,
            random_state=SEED, auto_class_weights="Balanced")
 def score_on(feats, Xf, Xe, hp=None):
@@ -406,7 +410,7 @@ T4 = to_md(pd.DataFrame([{
      f"{M['TN']} / {M['FP']} / {M['FN']} / {M['TP']}")]]),
     "table04_performance",
     f"Table 4. Model performance on the test partition (n = {M['n']}), "
-    f"CatBoost with {K} features under the corrected protocol.")
+    f"CatBoost with {K} features.")
 R["performance"] = {**M, "ci95": CI, "ci_width_au_pr": float(CI_W)}
 
 # =============================================================================
@@ -445,8 +449,9 @@ PT = pd.DataFrame(rows)
 op = operational(y_te, s_te, thr, pi)["upper95"]
 T5 = to_md(PT, "table05_prevalence",
     f"Table 5. Alert quality at operational prevalence, threshold {thr:.3f} "
-    f"({rule}). A false-positive rate measured at zero on {mt['FP']+mt['TN']} benign "
-    f"instances is not zero; the upper95 rows apply the rule of three.")
+    f"({rule}). The upper95 rows use the one-sided 95% Clopper-Pearson upper bound "
+    f"on the false-positive rate ({mt['FP']} false positives among "
+    f"{mt['FP']+mt['TN']} benign test versions).")
 print(f"\nSeuil {thr:.3f} | rappel val {mv['recall']:.3f} -> test {mt['recall']:.3f} "
       f"(ecart {gap:+.3f}) | VPP a {pi:.1%} : {op['PPV']:.4f}")
 R["operational"] = {"threshold": thr, "rule": rule, "transfer_gap": float(gap),
@@ -464,9 +469,11 @@ for _ in range(CFG["n_random_draws"]):
     vf.append((average_precision_score(y_te, s), roc_auc_score(y_te, s),
                sum(1 for f in fs if f in PROXIES)))
 vf = np.array(vf)
-vp = [average_precision_score(y_te, score_on(
-        list(rng.choice(F_POST, size=min(K, len(F_POST)), replace=False)),
-        Xtr, Xte, hp=HP)) for _ in range(CFG["n_random_draws"])]
+vp, vp_auc = [], []                  # meme sequence aleatoire qu'avant ; AUC ajoutee
+for _ in range(CFG["n_random_draws"]):
+    s = score_on(list(rng.choice(F_POST, size=min(K, len(F_POST)), replace=False)),
+                 Xtr, Xte, hp=HP)
+    vp.append(average_precision_score(y_te, s)); vp_auc.append(roc_auc_score(y_te, s))
 g_full = M["au_pr"] - float(np.median(vf[:, 0]))
 g_post = M["au_pr"] - float(np.median(vp))
 sel_sig = g_post >= CI_W
@@ -476,7 +483,8 @@ T6 = to_md(pd.DataFrame([
      "AU-PR": float(np.median(vf[:, 0])), "AUC-ROC": float(np.median(vf[:, 1])),
      "Mean proxies per draw": float(vf[:, 2].mean())},
     {"Feature set": f"Random {K} of {len(F_POST)} (post-filter)",
-     "AU-PR": float(np.median(vp)), "AUC-ROC": np.nan, "Mean proxies per draw": 0.0},
+     "AU-PR": float(np.median(vp)), "AUC-ROC": float(np.median(vp_auc)),
+     "Mean proxies per draw": 0.0},
     {"Feature set": f"Selected {K} (ours)", "AU-PR": M["au_pr"],
      "AUC-ROC": M["auc_roc"], "Mean proxies per draw": 0.0}]),
     "table06_gain_decomposition",
@@ -489,7 +497,8 @@ R["gain_decomposition"] = {
     "random_full": {"n": len(F_FULL), "au_pr": float(np.median(vf[:,0])),
                     "auc": float(np.median(vf[:,1])),
                     "mean_proxies": float(vf[:,2].mean())},
-    "random_post": {"n": len(F_POST), "au_pr": float(np.median(vp))},
+    "random_post": {"n": len(F_POST), "au_pr": float(np.median(vp)),
+                    "auc": float(np.median(vp_auc))},
     "prefilter_gain": float(g_full-g_post), "selection_gain": float(g_post),
     "selection_exceeds_ci": bool(sel_sig)}
 
@@ -501,7 +510,7 @@ for k in [k for k in CFG["k_sweep"] if k <= len(F_POST)]:
 SWEEP = pd.DataFrame(sweep)
 ref = float(SWEEP.loc[SWEEP.k == K, "AU-PR"].iloc[0])
 SWEEP["Delta vs k=18"] = SWEEP["AU-PR"] - ref
-SWEEP["Within CI"] = SWEEP["Delta vs k=18"].abs() <= CI_W
+SWEEP["|Delta| <= CI width"] = SWEEP["Delta vs k=18"].abs() <= CI_W
 T7 = to_md(SWEEP, "table07_k_sweep",
     f"Table 7. Performance as a function of feature-set size. Differences from "
     f"k = {K} are compared with the bootstrap interval width ({CI_W:.4f}); k was "
@@ -644,8 +653,9 @@ if df.ecosystem.nunique() > 1:
           "AU-PR": np.nan, "AU-PR baseline": np.nan, "n test": len(df),
           "n malicious": int(df.label.sum())}]), "table11_cross_ecosystem",
         f"Table 11. Cross-ecosystem transfer. A classifier using only the ecosystem "
-        f"of origin attains AUC-ROC {auc_eco:.4f}, so {share:.1%} of discrimination "
-        f"above chance is attributable to registry identity.")
+        f"of origin (computed on all {len(df)} versions) attains AUC-ROC {auc_eco:.4f}, "
+        f"which corresponds to {share:.1%} of the above-chance AUC margin of the full "
+        f"model; this is a descriptive, non-causal comparison.")
     print(f"[b] AUC ecosysteme seul {auc_eco:.4f} -> part {share:.1%}")
     R["ecosystem_confound"] = {"auc_ecosystem_only": float(auc_eco),
                                "share": float(share), "cross": cross}
@@ -695,7 +705,7 @@ sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", cbar=False, ax=ax,
             xticklabels=["Benign", "Malicious"], yticklabels=["Benign", "Malicious"],
             annot_kws={"fontsize": 13})
 ax.set_xlabel("Predicted", fontsize=9.5); ax.set_ylabel("True label", fontsize=9.5)
-ax.set_title(f"CatBoost, corrected protocol, threshold {thr:.2f} (n = {cm.sum()})",
+ax.set_title(f"CatBoost, threshold {thr:.2f} (n = {cm.sum()})",
              fontsize=9.6, fontweight="bold")
 save(fig, "figure3_confusion_matrix")
 
@@ -708,7 +718,7 @@ for ax, col, lab, colr, mk, ls, w, tag in [
         (axes[1], "AUC-ROC", "AUC-ROC", ORANGE, "s", "--", ci_auc_w, "(b)")]:
     r_ = float(SWEEP.loc[SWEEP.k == K, col].iloc[0])
     ax.axhspan(r_-w, r_+w, color=colr, alpha=.11, zorder=0,
-               label=f"within 95% CI at $k$={K} (±{w:.4f})")
+               label=rf"$|\Delta|$ ≤ 95% CI width at $k$={K} ({w:.4f})")
     ax.plot(SWEEP.k, SWEEP[col], marker=mk, ls=ls, color=colr, lw=1.8, ms=6,
             label=lab, zorder=3)
     ax.axvline(K, color=GREY, ls=":", lw=1.3, zorder=2)
@@ -731,7 +741,7 @@ save(fig, "figure4_k_sweep")
 # Figure 5 : SHAP summary
 fig = plt.figure(figsize=(7.2, 5.6))
 shap.summary_plot(sv, Xte_s, show=False, max_display=K)
-plt.title(f"SHAP summary, CatBoost, corrected protocol (n = {M['n']})",
+plt.title(f"SHAP summary, CatBoost (n = {M['n']})",
           fontsize=10, fontweight="bold")
 plt.tight_layout(); save(plt.gcf(), "figure5_shap_summary")
 
@@ -796,35 +806,35 @@ pd.concat([p[["package", "version", "ecosystem", "group_id"]].assign(split=n)
           ).to_csv(f"{OUT}/final_partitions.csv", index=False)
 open(f"{TAB}/ALL_TABLES.md", "w").write("\n\n---\n\n".join(MD[k] for k in sorted(MD)))
 
-guide = f"""# Valeurs a reporter — jcp-4466772
+guide = f"""# Valeurs a reporter
 
 Genere le {R['generated_at']}. Toute valeur du manuscrit doit venir d'ici.
 
 ## Tables (dans {TAB}/, aussi en Markdown dans ALL_TABLES.md)
 
-| Fichier | Section du manuscrit |
+| Fichier | Manuscrit |
 |---|---|
-| table01_dataset, table01b_partitions | 2.3, Table 1 |
-| table02_reduction | 2.4, Table 2 |
+| table01_dataset, table01b_partitions | 2.2, Tables 1a et 1b |
+| table02_reduction | 2.3, Table 2 |
 | table03_features | 3.1, Table 3 |
 | table04_performance | 3.2, Table 4 |
-| table05_prevalence | 3.6, Table 5 |
-| table06_gain_decomposition | 3.2, Table 6 |
-| table07_k_sweep | 3.2, Table 7 |
-| table08_paired_tests | 3.2, Table 8 |
-| table09_family_ablation | 3.3, Table 9 |
-| table10_robustness | 3.5, Table 10 |
-| table11_cross_ecosystem | 3.5, Table 11 |
+| table08_paired_tests | 3.4, Table 5a |
+| table06_gain_decomposition | 3.1, Table 6 |
+| table07_k_sweep | 3.1, Table 7 |
+| table09_family_ablation | 3.3, Table 8 |
+| table10_robustness | 3.5, Table 9 |
+| table05_prevalence | 3.5, Table 10 |
+| table11_cross_ecosystem | 3.7, Table 11 |
 
 ## Figures (dans {FIG}/, en PNG 600 dpi, PDF et SVG)
 
-| Fichier | Section |
+| Fichier | Manuscrit |
 |---|---|
-| figure2_feature_categories | 3.1 |
-| figure3_confusion_matrix | 3.2 |
-| figure4_k_sweep | 3.2 |
-| figure5_shap_summary | 3.3 |
-| figure6_calibration | 3.6 |
+| figure2_feature_categories | 2.3, Fig. 2 |
+| figure4_k_sweep | 3.1, Fig. 3 |
+| figure3_confusion_matrix | 3.2, Fig. 4 |
+| figure5_shap_summary | 3.3, Fig. 5 |
+| figure6_calibration | 3.6, Fig. 6 |
 
 La Figure 1 (schema du pipeline) se genere separement.
 
@@ -870,5 +880,3 @@ Pre-filtre  {g_full-g_post:+.4f} | selection {g_post:+.4f} | IC {CI_W:.4f}
 Guide       {OUT}/MANUSCRIPT_VALUES.md
 Tracabilite {OUT}/final_results.json
 ======================================================================""")
-
-!pip install catboost
