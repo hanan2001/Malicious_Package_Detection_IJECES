@@ -385,6 +385,9 @@ R["hyperparameters"] = {"grid": grid, "selected": gs.best_params_,
 sv = shap.TreeExplainer(model).shap_values(Xte_s)
 if isinstance(sv, list): sv = sv[1]
 SHAPV = pd.Series(np.abs(sv).mean(0), index=SEL).sort_values(ascending=False)
+# valeurs SHAP par version du test, pour regenerer la Figure 5 sans reentrainer
+np.savez_compressed(f"{OUT}/shap_values.npz", shap=sv, X=Xte_s.values,
+                    X_raw=numeric_pit(test)[SEL].values, features=np.array(SEL))
 
 # ---- TABLE 3 : les k features -------------------------------------------
 T3 = to_md(pd.DataFrame([

@@ -52,6 +52,18 @@ configuration block, then run all cells.
 
 Runtime is about 15 minutes on CPU. The random seed is fixed (`SEED = 42`).
 
+### Journal-style figures
+
+`make_figures_journal.py` redraws Figs. 1–6 from the pipeline outputs
+(`Results/final_results.json`, `Tables/table03_features.csv`,
+`Results/shap_values.npz`) without changing any value: IJECES column widths
+(88 / 180 mm), 7–8 pt sans-serif text, colour-blind-safe palette, vector PDF/SVG
+and 600 dpi PNG/TIFF in `Figures/journal/`.
+
+```bash
+python make_figures_journal.py
+```
+
 ### Reproducibility check
 
 The reported values were generated on 15 August 2026 (`Results/final_results.json`).
