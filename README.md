@@ -6,8 +6,8 @@ Replication package for the paper:
 H. Moufid, M. El Ghazouani, M. A. El Kiram
 *International Journal of Electrical and Computer Engineering Systems* (under review).
 
-Every numerical value reported in the manuscript is produced by the single
-script in this repository and is traceable to `Results/final_results.json`.
+Every numerical value reported in the manuscript is traceable to `Results/final_results.json`,
+except the literature values of Table 5b.
 
 ---
 
@@ -15,13 +15,14 @@ script in this repository and is traceable to `Results/final_results.json`.
 
 | Path | Description |
 |---|---|
-| `final_pipeline_ijeces.py` | Main script. Reproduces every table and figure of the paper. |
-| `Notebook/final_pipeline_ijeces.ipynb` | The same pipeline as a Colab notebook. |
+| `final_pipeline_ijeces.py` | Main script. Runs the full experiment and reproduces every table and reported value. |
+| `make_figures_journal.py` | Draws Figs. 1–6 of the paper from the pipeline outputs. |
 | `Dataset/dataset_v5.csv` | Point-in-time metadata for the 3,330 package versions used in the paper. |
 | `Tables/` | Tables 1a–11 as CSV, plus `ALL_TABLES.md` (Markdown, ready to paste). |
-| `Figures/` | Figures 2–6 in PNG (600 dpi), PDF and SVG. |
+| `Figures/` | Figs. 1–6 of the paper in PDF and SVG (vector) and PNG and TIFF (600 dpi). |
 | `Results/final_results.json` | Every reported value, in one file. |
 | `Results/MANUSCRIPT_VALUES.md` | Maps each table and figure to the section of the paper that cites it. |
+| `Results/shap_values.npz` | Per-version SHAP values on the test partition, used to draw Fig. 5. |
 | `requirements.txt` | Python dependencies. |
 
 ---
@@ -41,27 +42,27 @@ python final_pipeline_ijeces.py
 ```
 
 The script reads `Dataset/dataset_v5.csv` and writes its outputs to
-`./IJECES_revision` (tables, figures, `final_results.json`). Both locations can be
-changed at the top of the script.
-
-### In Google Colab
-
-Open `Notebook/final_pipeline_ijeces.ipynb`, upload `Dataset/dataset_v5.csv`
-(or mount the drive folder that contains it), set the input path in the
-configuration block, then run all cells.
-
-Runtime is about 15 minutes on CPU. The random seed is fixed (`SEED = 42`).
+`./IJECES_revision` (tables, control figures, `final_results.json`,
+`shap_values.npz`). Both locations can be changed at the top of the script.
+The random seed is fixed (`SEED = 42`); a full run takes about 15 minutes on CPU.
 
 ### Journal-style figures
 
-`make_figures_journal.py` redraws Figs. 1–6 from the pipeline outputs
-(`Results/final_results.json`, `Tables/table03_features.csv`,
+The figures of the paper are drawn by `make_figures_journal.py` from the
+pipeline outputs (`Results/final_results.json`, `Tables/table03_features.csv`,
 `Results/shap_values.npz`) without changing any value: IJECES column widths
-(88 / 180 mm), 7–8 pt sans-serif text, colour-blind-safe palette, vector PDF/SVG
-and 600 dpi PNG/TIFF in `Figures/journal/`.
+(88 / 180 mm), 6.5–8 pt sans-serif text, colour-blind-safe palette, vector
+PDF/SVG and 600 dpi PNG/TIFF, written to `Figures/`.
 
 ```bash
 python make_figures_journal.py
+```
+
+By default the script reads the files committed in `Results/` and `Tables/`.
+To draw the figures from a new pipeline run, point it to that run's outputs:
+
+```bash
+python make_figures_journal.py --results IJECES_revision/final_results.json --tables IJECES_revision/tables --shap IJECES_revision/shap_values.npz
 ```
 
 ### Reproducibility check
@@ -80,7 +81,7 @@ versions and do not change any reported conclusion.
 
 ## Mapping between output files and the paper
 
-File names follow the generation script's internal numbering, which does not
+Table file names follow the pipeline's internal numbering, which does not
 always coincide with the numbering in the paper. The correspondence is:
 
 ### Tables
@@ -105,12 +106,12 @@ always coincide with the numbering in the paper. The correspondence is:
 
 | Paper | File in `Figures/` |
 |---|---|
-| Fig. 1 — Pipeline overview | *(schematic; not generated)* |
-| Fig. 2 — Distribution of selected features by category | `figure2_feature_categories.*` |
-| Fig. 3 — Performance versus feature-set size | `figure4_k_sweep.*` |
-| Fig. 4 — Confusion matrix | `figure3_confusion_matrix.*` |
-| Fig. 5 — SHAP summary plot | `figure5_shap_summary.*` |
-| Fig. 6 — Reliability diagram | `figure6_calibration.*` |
+| Fig. 1 — Pipeline overview | `fig1_pipeline.*` |
+| Fig. 2 — Distribution of selected features by category | `fig2_feature_categories.*` |
+| Fig. 3 — Performance versus feature-set size | `fig3_k_sweep.*` |
+| Fig. 4 — Confusion matrix | `fig4_confusion_matrix.*` |
+| Fig. 5 — SHAP summary | `fig5_shap_summary.*` |
+| Fig. 6 — Reliability diagram | `fig6_calibration.*` |
 
 ---
 
@@ -126,13 +127,13 @@ paper, in this order:
    threshold 0.85). No group appears in more than one partition.
 2. Imputation, winsorisation (1st/99th percentiles) and standardisation fitted
    on the training partition alone.
-3. Ecosystem pre-filter computed on the training partition: attributes whose
-   standard deviation is zero within at least one registry are removed
-   (456 → 52).
-4. Embedded selection on the training partition: CatBoost gain importance,
+3. Ecosystem pre-filter computed on the training partition: manifest
+   attributes (`vman_*`) whose standard deviation is zero within at least one
+   registry are removed (456 → 52).
+4. Embedded selection on the training partition: CatBoost feature importance,
    top *k* = 18, with *k* fixed a priori (52 → 18).
-5. Hyperparameter search by grouped five-fold cross-validation within the
-   training partition.
+5. Hyperparameter search by grouped, stratified five-fold cross-validation
+   within the training partition.
 6. Threshold: a threshold maximising validation PPV at 0.1% prevalence (with
    validation recall >= 0.70) is computed first; because its recall did not
    transfer (validation-test recall difference above the pre-declared
@@ -207,5 +208,3 @@ ecosystem.
 ```
 
 ---
-
-

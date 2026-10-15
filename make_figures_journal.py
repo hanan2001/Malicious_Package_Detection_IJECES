@@ -13,7 +13,7 @@ aucune valeur n'est saisie a la main. Seuls la mise en forme et le type de trace
   - sorties vectorielles (PDF polices incorporees, SVG) + PNG et TIFF 600 dpi.
 
 Usage :
-    python make_figures_journal.py                # ecrit dans Figures/journal/
+    python make_figures_journal.py                # ecrit dans Figures/
     python make_figures_journal.py --out autre/dossier
 """
 import argparse, json, os, textwrap
@@ -285,7 +285,7 @@ def main():
     ap.add_argument("--results", default=os.path.join(here, "Results", "final_results.json"))
     ap.add_argument("--tables", default=os.path.join(here, "Tables"))
     ap.add_argument("--shap", default=os.path.join(here, "Results", "shap_values.npz"))
-    ap.add_argument("--out", default=os.path.join(here, "Figures", "journal"))
+    ap.add_argument("--out", default=os.path.join(here, "Figures"))
     a = ap.parse_args()
     os.makedirs(a.out, exist_ok=True)
     R = json.load(open(a.results, encoding="utf8"))
