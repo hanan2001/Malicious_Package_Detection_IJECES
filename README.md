@@ -193,6 +193,18 @@ versions (22 March 2024 – 5 August 2026 for NPM; 10 January 2022 – 19 July 2
 for PyPI). Deduplication is by exact match on package name, version and
 ecosystem.
 
+### Benign sampling queries
+
+NPM benign packages were retrieved with the registry search API using the 50
+keywords below (paginated requests, exponential backoff from 1 s, doubling on
+HTTP 429 up to 32 s). PyPI benign packages combine the top 1,000 packages by
+30-day download count (January 2024) with 2,000 entries sampled at random from
+the simple index (https://pypi.org/simple/).
+
+```
+utils, test, lib, api, cli, http, auth, parser, logger, config, stream, crypto, date, format, validate, router, cache, queue, socket, template, math, string, array, object, file, path, url, json, yaml, csv, image, color, random, uuid, hash, compress, server, client, proxy, middleware, plugin, build, bundle, lint, mock, fixture, assert, benchmark, docs, types
+```
+
 ---
 
 ## Citation
