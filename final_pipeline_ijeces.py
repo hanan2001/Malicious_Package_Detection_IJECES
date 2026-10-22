@@ -819,12 +819,12 @@ Genere le {R['generated_at']}. Toute valeur du manuscrit doit venir d'ici.
 |---|---|
 | table01_dataset, table01b_partitions | 2.2, Tables 1a et 1b |
 | table02_reduction | 2.3, Table 2 |
-| table03_features | 3.1, Table 3 |
-| table04_performance | 3.2, Table 4 |
-| table08_paired_tests | 3.4, Table 5a |
-| table06_gain_decomposition | 3.1, Table 6 |
-| table07_k_sweep | 3.1, Table 7 |
-| table09_family_ablation | 3.3, Table 8 |
+| table03_features | 2.3, Table 3 |
+| table06_gain_decomposition | 3.1, Table 4 |
+| table07_k_sweep | 3.1, Table 5 |
+| table04_performance | 3.2, Table 6 |
+| table09_family_ablation | 3.3, Table 7 |
+| table08_paired_tests | 3.4, Table 8a |
 | table10_robustness | 3.5, Table 9 |
 | table05_prevalence | 3.5, Table 10 |
 | table11_cross_ecosystem | 3.7, Table 11 |

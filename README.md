@@ -7,7 +7,7 @@ H. Moufid, M. El Ghazouani, M. A. El Kiram
 *International Journal of Electrical and Computer Engineering Systems* (under review).
 
 Every numerical value reported in the manuscript is traceable to `Results/final_results.json`,
-except the literature values of Table 5b.
+except the literature values of Table 8b.
 
 ---
 
@@ -70,10 +70,10 @@ python make_figures_journal.py --results IJECES_revision/final_results.json --ta
 The reported values were generated on 15 August 2026 (`Results/final_results.json`).
 Re-running the script on `Dataset/dataset_v5.csv` with Python 3.10,
 scikit-learn 1.3.2, CatBoost 1.2.5 and SHAP 0.44.1 (the versions pinned in
-`requirements.txt`) reproduces Tables 1a, 1b, 2, 4, 6, 7, 8, 9 and 10 and the
+`requirements.txt`) reproduces Tables 1a, 1b, 2, 4, 5, 6, 7, 9 and 10 and the
 calibration metrics exactly. Mean |SHAP| values (Table 3) differ by at most
 0.0005, the cross-ecosystem transfer values (Table 11) by at most 0.0014, and
-the random-forest comparison of Table 5a by at most 0.0002 in AU-PR and one
+the random-forest comparison of Table 8a by at most 0.0002 in AU-PR and one
 discordant pair in the McNemar counts; these differences come from library
 versions and do not change any reported conclusion.
 
@@ -92,12 +92,12 @@ always coincide with the numbering in the paper. The correspondence is:
 | Table 1b — Partition sizes | `table01b_partitions.csv` |
 | Table 2 — Feature space reduction | `table02_reduction.csv` |
 | Table 3 — The 18 selected features | `table03_features.csv` |
-| Table 4 — Model performance on the test partition | `table04_performance.csv` |
-| Table 5a — Paired comparison against alternative selectors | `table08_paired_tests.csv` |
-| Table 5b — Published systems | *(literature values; not generated)* |
-| Table 6 — Gain decomposition | `table06_gain_decomposition.csv` |
-| Table 7 — Feature-set size sweep | `table07_k_sweep.csv` |
-| Table 8 — Metadata-family ablation | `table09_family_ablation.csv` |
+| Table 4 — Gain decomposition | `table06_gain_decomposition.csv` |
+| Table 5 — Feature-set size sweep | `table07_k_sweep.csv` |
+| Table 6 — Model performance on the test partition | `table04_performance.csv` |
+| Table 7 — Metadata-family ablation | `table09_family_ablation.csv` |
+| Table 8a — Paired comparison against alternative selectors | `table08_paired_tests.csv` |
+| Table 8b — Published systems | *(literature values; not generated)* |
 | Table 9 — Robustness to perturbations | `table10_robustness.csv` |
 | Table 10 — Alert quality at operational prevalence | `table05_prevalence.csv` |
 | Table 11 — Cross-ecosystem transfer | `table11_cross_ecosystem.csv` |
